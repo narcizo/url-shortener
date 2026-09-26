@@ -1,0 +1,5 @@
+name: url-shortener
+variables:
+  - name: baseUrl
+    value: http://localhost:3000
+    description: Nestjs local port
