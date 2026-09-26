@@ -5,6 +5,28 @@ on: push
 jobs:
   precheck:
     runs-on: ubuntu-26.04
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - "5433:5432"
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+
+    env:
+      APP_PORT: 3000
+      PSQL_HOST: localhost
+      PSQL_PORT: 5433
+      PSQL_USER: ci
+      PSQL_PASSWORD: ci
+      PSQL_DB: ci
     steps:
       - name: Checkout
         uses: actions/checkout@v7

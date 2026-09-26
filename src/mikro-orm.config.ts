@@ -1,13 +1,8 @@
-import { ReflectMetadataProvider } from "@mikro-orm/decorators/legacy";
-import { defineConfig } from "@mikro-orm/postgresql";
+import "reflect-metadata";
 
-export default defineConfig({
-  host: process.env.PSQL_HOST,
-  port: Number(process.env.PSQL_PORT ?? 5432),
-  dbName: process.env.PSQL_DB ?? "urlShortener-nest",
-  user: process.env.PSQL_USER,
-  password: process.env.PSQL_PASSWORD,
-  entities: ["./dist/**/*.entity.js"],
-  entitiesTs: ["./src/**/*.entity.ts"],
-  metadataProvider: ReflectMetadataProvider
-});
+import { validate } from "./config/env.validation.js";
+import { createMikroOrmConfig } from "./database/mikro-orm.options.js";
+
+const env = validate(process.env);
+
+export default createMikroOrmConfig((key) => env[key]);

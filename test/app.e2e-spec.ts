@@ -5,7 +5,7 @@ import { App } from "supertest/types.js";
 
 import { AppModule } from "./../src/app.module.js";
 
-describe("AppController (e2e)", () => {
+describe("Health (e2e)", () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -17,8 +17,9 @@ describe("AppController (e2e)", () => {
     await app.init();
   });
 
-  it("/health (GET)", () => {
-    return request(app.getHttpServer()).get("/health").expect(200);
+  it("/health (GET)", async () => {
+    const res = await request(app.getHttpServer()).get("/health").expect(200);
+    expect(res.body.status).toBe("ok");
   });
 
   afterEach(async () => {

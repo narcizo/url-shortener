@@ -1,17 +1,39 @@
 import { MikroOrmModule } from "@mikro-orm/nestjs";
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { MikroORM, PostgreSqlDriver } from "@mikro-orm/postgresql";
+import { Module, OnModuleInit, ValidationPipe } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { APP_PIPE } from "@nestjs/core";
 
-import { AppController } from "./app.controller.js";
-import { AppService } from "./app.service.js";
-import { validate } from "./config/env.validation.js";
-import config from "./mikro-orm.config.js";
+import { EnvironmentVariables, validate } from "./config/env.validation.js";
+import { createMikroOrmConfig } from "./database/mikro-orm.options.js";
+import { HealthModule } from "./health/health.module.js";
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate }),
-    MikroOrmModule.forRoot(config)
+    MikroOrmModule.forRootAsync({
+      driver: PostgreSqlDriver,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<EnvironmentVariables, true>) =>
+        createMikroOrmConfig((key) => config.get(key, { infer: true }))
+    }),
+    HealthModule
   ],
-  controllers: [AppController],
-  providers: [AppService]
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true
+      })
+    }
+  ]
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(private readonly orm: MikroORM) {}
+
+  async onModuleInit() {
+    await this.orm.connect();
+  }
+}
