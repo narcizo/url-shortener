@@ -7,6 +7,7 @@ import { APP_PIPE } from "@nestjs/core";
 import { EnvironmentVariables, validate } from "./config/env.validation.js";
 import { createMikroOrmConfig } from "./database/mikro-orm.options.js";
 import { HealthModule } from "./health/health.module.js";
+import { ShortUrlModule } from "./short-url/short-url.module.js";
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { HealthModule } from "./health/health.module.js";
       useFactory: (config: ConfigService<EnvironmentVariables, true>) =>
         createMikroOrmConfig((key) => config.get(key, { infer: true }))
     }),
-    HealthModule
+    HealthModule,
+    ShortUrlModule
   ],
   providers: [
     {
