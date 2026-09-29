@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/url-short"
+  url: "{{baseUrl}}/api/v1/data/shorten"
   auth: inherit
 
 settings:
