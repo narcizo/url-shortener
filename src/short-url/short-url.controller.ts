@@ -1,34 +1,27 @@
-import { Body, Controller, Get, HttpCode, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Redirect } from "@nestjs/common";
 
 import {
   CreateShortUrlRequest,
   type CreateShortUrlResponse,
-  GetShortUrlRequest,
-  GetShortUrlResponse
+  ShortCodeParams
 } from "./dto/shortUrl.dto.js";
 import { ShortUrlService } from "./short-url.service.js";
 
-@Controller("short-url")
+@Controller()
 export class ShortUrlController {
   constructor(private readonly shortUrlService: ShortUrlService) {}
 
-  @Post()
-  async createShortUrl(
+  @Post("api/v1/data/shorten")
+  createShortUrl(
     @Body() body: CreateShortUrlRequest
   ): Promise<CreateShortUrlResponse> {
-    const response = await this.shortUrlService.createShortUrl(body);
-
-    return response;
+    return this.shortUrlService.createShortUrl(body);
   }
 
-  @Get(":shortUrl")
-  @HttpCode(302) //redirected
-  async getLongUrl(
-    @Param() param: GetShortUrlRequest
-  ): Promise<GetShortUrlResponse> {
-    const { shortUrl } = param;
-    const response = await this.shortUrlService.getShorUrl({ shortUrl });
-
-    return response;
+  @Get(":code")
+  @Redirect()
+  async redirect(@Param() { code }: ShortCodeParams) {
+    const url = await this.shortUrlService.getLongUrl(code);
+    return { url, statusCode: 302 };
   }
 }

@@ -4,8 +4,14 @@ info:
   seq: 2
 
 http:
-  method: GET
-  url: ""
+  method: POST
+  url: "{{baseUrl}}/api/v1/data/shorten"
+  body:
+    type: json
+    data: |-
+      {
+        "longUrl": "https://expressjs.com/en/5x/api/request/#reqquery"
+      }
   auth: inherit
 
 settings:

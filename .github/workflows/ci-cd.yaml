@@ -49,5 +49,8 @@ jobs:
       - name: Unit tests
         run: bun run test
 
+      - name: Run migrations
+        run: bun --bun mikro-orm migration:up
+
       - name: E2E tests
         run: bun run test:e2e
